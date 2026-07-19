@@ -106,7 +106,7 @@ User
 - 依存関係の追加は最小限にし、追加する場合は理由を説明する
 - 変更は依頼された範囲に留め、無関係なリファクタリングをしない
 - 説明は日本語で行う
-- 言語は Dart、UI は Material3 を使う
+- 言語は Dart、UI は Material3 を使う、Material Themeは、 `/lib/theme.dart`を参照すること。
 
 
 ## 参照
