@@ -13,7 +13,7 @@
 
 Tomorrow Planterの特徴は、AIが答えを一方的に提示するのではなく、**AI Agent同士の議論をリアルタイムで可視化し、その議論にユーザー自身も参加できる**ことです。ユーザー・AI Agent・過去の記録が協力して意思決定を行うことで、毎日の小さな選択を積み重ね、未来の自分を育てていきます。
 
-また、Cloud SQL（PostgreSQL + pgvector）に蓄積された振り返りやタスク履歴をRAG（Retrieval-Augmented Generation）の知識ベースとして活用することで、AIは「過去の自分」の経験を参考にしながら、一人ひとりに最適化されたアドバイスやスケジュールを生成します。
+また、Cloud Firestore に蓄積された振り返りやタスク履歴を、ベクトル検索による RAG（Retrieval-Augmented Generation）の知識ベースとして活用することで、AIは「過去の自分」の経験を参考にしながら、一人ひとりに最適化されたアドバイスやスケジュールを生成します。
 
 Tomorrow Planterは、Todoを管理するアプリではありません。
 
@@ -409,7 +409,7 @@ RAGで取得した過去のデータも参考にする。
 
 ---
 
-# データベース設計（Cloud SQL）
+# データベース設計（Cloud Firestore）
 
 ```
 User
@@ -426,7 +426,7 @@ User
  │
  ├── Memory
  │
- └── Embedding(pgvector)
+ └── Embedding（Firestore ベクトル検索）
 ```
 
 ---
@@ -477,37 +477,37 @@ AI会議も保存する。
 
 ## Database
 
-- Cloud SQL (PostgreSQL)
-- pgvector
+- Cloud Firestore
+- Firestore ベクトル検索（RAG・Embedding）
 
 ---
 
 ## Infrastructure
 
+- Firebase Authentication
+- Firebase Storage
 - Cloud Run
-- Cloud Storage
 - Cloud Tasks
 - Cloud Scheduler
 - Secret Manager
 - Cloud Logging
 - Cloud Monitoring
-- Identity Platform
 
 ---
 
-# Google Cloud構成
+# Google Cloud / Firebase 構成
 
 | サービス | 用途 |
 | --- | --- |
 | ADK | Multi-Agent構築 |
 | Gemini | 各Agentの思考・会話・計画生成 |
 | Cloud Run | Backend・Agent実行環境 |
-| Cloud SQL(PostgreSQL) | データ保存 |
-| pgvector | RAG・Embedding検索 |
-| Cloud Storage | 添付ファイル保存 |
+| Cloud Firestore | データ保存 |
+| Firestore ベクトル検索 | RAG・Embedding検索 |
+| Firebase Storage | 添付ファイル保存 |
 | Cloud Tasks | 非同期Agent処理 |
 | Cloud Scheduler | 朝・夜の定期処理 |
-| Identity Platform | 認証 |
+| Firebase Authentication | 認証 |
 | Secret Manager | APIキー管理 |
 | Cloud Logging | Agentログ |
 | Cloud Monitoring | モニタリング |
@@ -519,11 +519,11 @@ AI会議も保存する。
 1. 夜にアプリを開く
 2. Reflection Agentと会話
 3. Geminiが内容を要約
-4. Memory AgentがCloud SQLから過去の似た日をRAG検索
+4. Memory AgentがFirestoreから過去の似た日をRAG検索
 5. Reflection / Priority / Planner / Coachが議論
 6. ユーザーも議論へ参加
 7. Planner Agentが明日の予定を生成
-8. Cloud SQLへ保存
+8. Firestoreへ保存
 9. 翌朝、通知とともに今日の予定を表示
 
 ---

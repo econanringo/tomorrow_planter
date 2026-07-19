@@ -75,8 +75,8 @@ Agent        Agent         Agent
 | Frontend | Flutter（既存 `lib/`） |
 | Backend | Python, FastAPI, Agent Development Kit (ADK) |
 | AI | Gemini（Vertex AI）, ADK Multi-Agent |
-| Database | Cloud SQL (PostgreSQL) + pgvector |
-| Infra | Cloud Run, Cloud Storage, Cloud Tasks, Cloud Scheduler, Secret Manager, Cloud Logging, Cloud Monitoring, Identity Platform |
+| Database | Cloud Firestore + Firestore ベクトル検索 |
+| Infra | Firebase Authentication, Firebase Storage, Cloud Run, Cloud Tasks, Cloud Scheduler, Secret Manager, Cloud Logging, Cloud Monitoring |
 
 現状のリポジトリは Flutter スキャフォールド中心。Backend（FastAPI / ADK）は今後追加する想定。
 
@@ -90,7 +90,7 @@ User
  ├── TomorrowPlan
  ├── AgentDiscussion
  ├── Memory
- └── Embedding(pgvector)
+ └── Embedding（Firestore ベクトル検索）
 ```
 
 `AgentDiscussion` は AI会議の発言を保存し、過去の議論を再生可能にする（`agent_name`, `message`, `reply_to`, `confidence`, `accepted` 等）。
@@ -103,6 +103,11 @@ User
 - **ユーザー参加を前提にする** — Agent出力を最終決定とせず、ユーザー発言で計画を更新できること
 - **機密をリポジトリに載せない** — APIキー等は Secret Manager 前提。`.env` や資格情報をコミットしない
 - **非同期処理は Cloud Tasks / Scheduler を想定** — 長時間の Agent 実行や朝・夜の定期処理に使う
+- 依存関係の追加は最小限にし、追加する場合は理由を説明する
+- 変更は依頼された範囲に留め、無関係なリファクタリングをしない
+- 説明は日本語で行う
+- 言語は Dart、UI は Material3 を使う
+
 
 ## 参照
 
