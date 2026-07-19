@@ -554,4 +554,28 @@ AI会議も保存する。
 > 
 > 
 > **AIと一緒に、明日をつくろう。**
->
+
+---
+
+# デモ MVP の起動
+
+詳細は [docs/setup-gcp.md](docs/setup-gcp.md) と [backend/README.md](backend/README.md)。
+
+```bash
+# Backend
+cd backend && source .venv/bin/activate
+export AUTH_DISABLED=true   # API単体確認時のみ。アプリ連携時は false + Firebase Auth
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8080
+
+# Flutter（別ターミナル）
+flutter run --dart-define=BACKEND_URL=http://localhost:8080
+```
+
+Cursor / VS Code では **Run and Debug（F5）** で起動できる。構成は [`.vscode/launch.json`](.vscode/launch.json)。
+
+- `Tomorrow Planter (macOS)` / `(Chrome)` / `(iOS simulator)` … Backend も自動起動し `BACKEND_URL=http://localhost:8080`
+- `Tomorrow Planter (Android emulator)` … `http://10.0.2.2:8080`
+- `Tomorrow Planter (Flutter only)` … Backend は手動起動済みのとき用
+
+Firebase Console で Authentication の **Email/Password** と **Google** を有効化してからサインインする（Anonymous は使わない）。
+Google ログイン用の構成ファイルの置き場所は [docs/setup-gcp.md](docs/setup-gcp.md) を参照。

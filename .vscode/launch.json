@@ -1,0 +1,56 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Tomorrow Planter (macOS)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "macos",
+      "toolArgs": [
+        "--dart-define=BACKEND_URL=http://localhost:8080"
+      ],
+      "preLaunchTask": "backend:uvicorn"
+    },
+    {
+      "name": "Tomorrow Planter (Chrome)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "chrome",
+      "toolArgs": [
+        "--dart-define=BACKEND_URL=http://localhost:8080"
+      ],
+      "preLaunchTask": "backend:uvicorn"
+    },
+    {
+      "name": "Tomorrow Planter (Android emulator)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--dart-define=BACKEND_URL=http://10.0.2.2:8080"
+      ],
+      "preLaunchTask": "backend:uvicorn"
+    },
+    {
+      "name": "Tomorrow Planter (iOS simulator)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--dart-define=BACKEND_URL=http://localhost:8080"
+      ],
+      "preLaunchTask": "backend:uvicorn"
+    },
+    {
+      "name": "Tomorrow Planter (Flutter only)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--dart-define=BACKEND_URL=http://localhost:8080"
+      ]
+    }
+  ]
+}

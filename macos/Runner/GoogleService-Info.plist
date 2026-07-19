@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>663596048557-cbdp0vnej9dm29iamjurcefj11pi5ru0.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.663596048557-cbdp0vnej9dm29iamjurcefj11pi5ru0</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>663596048557-ibloouitvudak6ld88i4avc9hmluqh8g.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyARpC6F22dYk0OPzcOlU1Ih40N2b6QdZ4A</string>
+	<key>GCM_SENDER_ID</key>
+	<string>663596048557</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.econanringo.tomorrowPlanter</string>
+	<key>PROJECT_ID</key>
+	<string>tomorrow-planter</string>
+	<key>STORAGE_BUCKET</key>
+	<string>tomorrow-planter.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:663596048557:ios:680d8164adc040901ba624</string>
+</dict>
+</plist>

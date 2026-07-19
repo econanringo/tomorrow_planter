@@ -1,0 +1,72 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "backend:uvicorn",
+      "type": "shell",
+      "command": "if [ -x .venv/bin/uvicorn ]; then .venv/bin/uvicorn app.main:app --reload --host 0.0.0.0 --port 8080; else python3 -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8080; fi",
+      "options": {
+        "cwd": "${workspaceFolder}/backend",
+        "env": {
+          "GCP_PROJECT_ID": "tomorrow-planter",
+          "FIREBASE_PROJECT_ID": "tomorrow-planter",
+          "GCP_LOCATION": "us-central1"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "uvicorn",
+        "severity": true,
+        "pattern": {
+          "regexp": "^(ERROR|CRITICAL):\\s+(.*)$",
+          "severity": 1,
+          "message": 2
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*(Started reloader process|Started server process).*",
+          "endsPattern": ".*(Application startup complete).*"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "backend"
+      }
+    },
+    {
+      "label": "backend:uvicorn (auth disabled)",
+      "type": "shell",
+      "command": "if [ -x .venv/bin/uvicorn ]; then .venv/bin/uvicorn app.main:app --reload --host 0.0.0.0 --port 8080; else python3 -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8080; fi",
+      "options": {
+        "cwd": "${workspaceFolder}/backend",
+        "env": {
+          "AUTH_DISABLED": "true",
+          "GCP_PROJECT_ID": "tomorrow-planter",
+          "FIREBASE_PROJECT_ID": "tomorrow-planter",
+          "GCP_LOCATION": "us-central1"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "uvicorn-auth-disabled",
+        "severity": true,
+        "pattern": {
+          "regexp": "^(ERROR|CRITICAL):\\s+(.*)$",
+          "severity": 1,
+          "message": 2
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*(Started reloader process|Started server process).*",
+          "endsPattern": ".*(Application startup complete).*"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "backend"
+      }
+    }
+  ]
+}

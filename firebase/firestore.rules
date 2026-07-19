@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Client read of own data is allowed.
+    // Agent / finalize writes go through Backend Admin SDK (bypass rules).
+    match /users/{uid} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid);
+      allow delete: if false;
+
+      match /goals/{goalId} {
+        allow read: if isOwner(uid);
+        allow write: if isOwner(uid);
+      }
+
+      match /tasks/{taskId} {
+        allow read: if isOwner(uid);
+        allow write: if isOwner(uid);
+      }
+
+      match /daily_reviews/{reviewId} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+
+      match /tomorrow_plans/{planId} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+
+      match /agent_discussions/{messageId} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+
+      match /memories/{memoryId} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+
+      match /sessions/{sessionId} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+    }
+  }
+}

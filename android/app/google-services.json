@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "663596048557",
+    "project_id": "tomorrow-planter",
+    "storage_bucket": "tomorrow-planter.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:663596048557:android:56586369c8ee21bf1ba624",
+        "android_client_info": {
+          "package_name": "com.econanringo.tomorrow_planter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "663596048557-ibloouitvudak6ld88i4avc9hmluqh8g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.econanringo.tomorrow_planter",
+            "certificate_hash": "71bf77868e09ee7dbaea00941311eecd7fd85094"
+          }
+        },
+        {
+          "client_id": "663596048557-pabnqrcc13fvamhajep5blhoisr1ttup.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHd9XLNdvbRFQddVfJ5xfdT6DKJfhbw40"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "663596048557-pabnqrcc13fvamhajep5blhoisr1ttup.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "663596048557-22grb2855rjmtha6spmjn35a7pb3p2cs.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.tomorrowPlanter"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
