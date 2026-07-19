@@ -278,3 +278,140 @@ class FirestoreRepository:
             return
         for (text, tags), emb in zip(memories, embeddings):
             self.save_memory(uid, text, emb, tags=tags)
+
+    def tasks_ref(self, uid: str) -> firestore.CollectionReference:
+        return self.user_ref(uid).collection("tasks")
+
+    def create_task(
+        self,
+        uid: str,
+        title: str,
+        deadline: str,
+        notes: Optional[str] = None,
+        status: str = "open",
+        subtasks: Optional[List[Dict[str, Any]]] = None,
+    ) -> Dict[str, Any]:
+        task_id = str(uuid4())
+        now = _now()
+        doc: Dict[str, Any] = {
+            "id": task_id,
+            "title": title,
+            "deadline": deadline,
+            "status": status,
+            "notes": notes,
+            "created_at": now,
+            "updated_at": now,
+        }
+        task_ref = self.tasks_ref(uid).document(task_id)
+        task_ref.set(doc)
+
+        saved_subtasks: List[Dict[str, Any]] = []
+        for raw in subtasks or []:
+            sub_id = str(uuid4())
+            suggested = raw.get("suggested_date") or deadline
+            scheduled = raw.get("scheduled_date") or suggested
+            sub_doc = {
+                "id": sub_id,
+                "parent_task_id": task_id,
+                "title": raw["title"],
+                "suggested_date": suggested,
+                "scheduled_date": scheduled,
+                "status": raw.get("status") or "accepted",
+                "order": int(raw.get("order") or 0),
+                "estimate_minutes": raw.get("estimate_minutes"),
+                "source": raw.get("source") or "ai",
+                "accepted": bool(raw.get("accepted", True)),
+                "created_at": now,
+            }
+            task_ref.collection("subtasks").document(sub_id).set(sub_doc)
+            saved_subtasks.append(sub_doc)
+
+        doc["subtasks"] = saved_subtasks
+        return doc
+
+    def list_subtasks(self, uid: str, task_id: str) -> List[Dict[str, Any]]:
+        snaps = (
+            self.tasks_ref(uid)
+            .document(task_id)
+            .collection("subtasks")
+            .order_by("order")
+            .stream()
+        )
+        out: List[Dict[str, Any]] = []
+        for snap in snaps:
+            data = snap.to_dict() or {}
+            data["id"] = snap.id
+            out.append(data)
+        return out
+
+    def get_task(self, uid: str, task_id: str) -> Dict[str, Any]:
+        snap = self.tasks_ref(uid).document(task_id).get()
+        if not snap.exists:
+            raise KeyError(f"task not found: {task_id}")
+        data = snap.to_dict() or {}
+        data["id"] = task_id
+        data["subtasks"] = self.list_subtasks(uid, task_id)
+        return data
+
+    def list_tasks(
+        self,
+        uid: str,
+        status: Optional[str] = None,
+        limit: int = 50,
+    ) -> List[Dict[str, Any]]:
+        # Avoid composite-index requirement: order then filter in memory.
+        snaps = (
+            self.tasks_ref(uid)
+            .order_by("created_at", direction=firestore.Query.DESCENDING)
+            .limit(max(limit, 100))
+            .stream()
+        )
+        out: List[Dict[str, Any]] = []
+        for snap in snaps:
+            data = snap.to_dict() or {}
+            if status and data.get("status") != status:
+                continue
+            data["id"] = snap.id
+            data["subtasks"] = self.list_subtasks(uid, snap.id)
+            out.append(data)
+            if len(out) >= limit:
+                break
+        return out
+
+    def delete_task(self, uid: str, task_id: str) -> None:
+        task_ref = self.tasks_ref(uid).document(task_id)
+        if not task_ref.get().exists:
+            raise KeyError(f"task not found: {task_id}")
+        for sub in task_ref.collection("subtasks").stream():
+            sub.reference.delete()
+        task_ref.delete()
+
+    def update_task(self, uid: str, task_id: str, **fields: Any) -> Dict[str, Any]:
+        task_ref = self.tasks_ref(uid).document(task_id)
+        if not task_ref.get().exists:
+            raise KeyError(f"task not found: {task_id}")
+        payload = {k: v for k, v in fields.items() if v is not None}
+        payload["updated_at"] = _now()
+        task_ref.update(payload)
+        return self.get_task(uid, task_id)
+
+    def update_subtask(
+        self,
+        uid: str,
+        task_id: str,
+        subtask_id: str,
+        **fields: Any,
+    ) -> Dict[str, Any]:
+        task_ref = self.tasks_ref(uid).document(task_id)
+        if not task_ref.get().exists:
+            raise KeyError(f"task not found: {task_id}")
+        sub_ref = task_ref.collection("subtasks").document(subtask_id)
+        snap = sub_ref.get()
+        if not snap.exists:
+            raise KeyError(f"subtask not found: {subtask_id}")
+        payload = {k: v for k, v in fields.items() if v is not None}
+        if payload:
+            sub_ref.update(payload)
+        data = sub_ref.get().to_dict() or {}
+        data["id"] = subtask_id
+        return data

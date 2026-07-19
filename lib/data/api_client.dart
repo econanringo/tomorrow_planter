@@ -89,6 +89,111 @@ class ApiClient {
     _ensureOk(res);
   }
 
+  Future<ParentTask> createTask({
+    required String title,
+    required String deadline,
+    String? notes,
+    List<SubTaskDraft>? subtasks,
+  }) async {
+    final body = <String, dynamic>{
+      'title': title,
+      'deadline': deadline,
+      'notes': ?notes,
+      if (subtasks != null) 'subtasks': subtasks.map((e) => e.toJson()).toList(),
+    };
+    final res = await _client.post(
+      _uri('/v1/tasks'),
+      headers: await _headers(),
+      body: jsonEncode(body),
+    );
+    _ensureOk(res);
+    return ParentTask.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+  }
+
+  Future<List<ParentTask>> listTasks({String? status}) async {
+    final uri = status == null
+        ? _uri('/v1/tasks')
+        : _uri('/v1/tasks').replace(queryParameters: {'status': status});
+    final res = await _client.get(uri, headers: await _headers());
+    _ensureOk(res);
+    final map = jsonDecode(res.body) as Map<String, dynamic>;
+    final raw = map['tasks'] as List<dynamic>? ?? [];
+    return raw
+        .map((e) => ParentTask.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<void> deleteTask({required String taskId}) async {
+    final res = await _client.delete(
+      _uri('/v1/tasks/$taskId'),
+      headers: await _headers(),
+    );
+    _ensureOk(res);
+  }
+
+  Future<ParentTask> updateTask({
+    required String taskId,
+    String? title,
+    String? deadline,
+    String? notes,
+    String? status,
+  }) async {
+    final body = <String, dynamic>{
+      'title': ?title,
+      'deadline': ?deadline,
+      'notes': ?notes,
+      'status': ?status,
+    };
+    final res = await _client.patch(
+      _uri('/v1/tasks/$taskId'),
+      headers: await _headers(),
+      body: jsonEncode(body),
+    );
+    _ensureOk(res);
+    return ParentTask.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+  }
+
+  Future<SavedSubTask> updateSubTask({
+    required String taskId,
+    required String subtaskId,
+    String? title,
+    String? suggestedDate,
+    String? scheduledDate,
+    int? estimateMinutes,
+    String? status,
+  }) async {
+    final body = <String, dynamic>{
+      'title': ?title,
+      'suggested_date': ?suggestedDate,
+      'scheduled_date': ?scheduledDate,
+      'estimate_minutes': ?estimateMinutes,
+      'status': ?status,
+    };
+    final res = await _client.patch(
+      _uri('/v1/tasks/$taskId/subtasks/$subtaskId'),
+      headers: await _headers(),
+      body: jsonEncode(body),
+    );
+    _ensureOk(res);
+    return SavedSubTask.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
+  }
+
+  /// Gemini Decomposer によるタスク分解（SSE）。
+  Stream<AgentSseEvent> decomposeTask({
+    required String title,
+    required String deadline,
+    String? notes,
+  }) async* {
+    yield* _ssePost(
+      '/v1/tasks/decompose',
+      body: {
+        'title': title,
+        'deadline': deadline,
+        'notes': ?notes,
+      },
+    );
+  }
+
   Stream<AgentSseEvent> _ssePost(
     String path, {
     Map<String, dynamic>? body,

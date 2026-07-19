@@ -149,3 +149,183 @@ class ChatMessage {
   final bool isUser;
   final double? confidence;
 }
+
+/// SSE `decompose_progress.stage` と対応する思考段階。
+enum DecomposeStage {
+  inspect,
+  memory,
+  breakdown,
+  schedule,
+}
+
+extension DecomposeStageX on DecomposeStage {
+  String get label {
+    switch (this) {
+      case DecomposeStage.inspect:
+        return '種を見つめています';
+      case DecomposeStage.memory:
+        return '過去の自分を参照しています';
+      case DecomposeStage.breakdown:
+        return 'ステップに分解しています';
+      case DecomposeStage.schedule:
+        return 'カレンダーに植え付けています';
+    }
+  }
+
+  String get sseValue => name;
+
+  static DecomposeStage? fromSse(String? value) {
+    if (value == null) return null;
+    for (final stage in DecomposeStage.values) {
+      if (stage.name == value) return stage;
+    }
+    return null;
+  }
+}
+
+class SubTaskDraft {
+  SubTaskDraft({
+    required this.title,
+    required this.suggestedDate,
+    this.estimateMinutes,
+    this.order = 0,
+  });
+
+  final String title;
+  final String suggestedDate;
+  final int? estimateMinutes;
+  final int order;
+
+  factory SubTaskDraft.fromJson(Map<String, dynamic> json) {
+    return SubTaskDraft(
+      title: json['title'] as String? ?? '',
+      suggestedDate: json['suggested_date'] as String? ?? '',
+      estimateMinutes: json['estimate_minutes'] as int?,
+      order: json['order'] as int? ?? 0,
+    );
+  }
+
+  SubTaskDraft copyWith({
+    String? title,
+    String? suggestedDate,
+    int? estimateMinutes,
+    int? order,
+    bool clearEstimate = false,
+  }) {
+    return SubTaskDraft(
+      title: title ?? this.title,
+      suggestedDate: suggestedDate ?? this.suggestedDate,
+      estimateMinutes:
+          clearEstimate ? null : (estimateMinutes ?? this.estimateMinutes),
+      order: order ?? this.order,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'title': title,
+        'suggested_date': suggestedDate,
+        'scheduled_date': suggestedDate,
+        'estimate_minutes': estimateMinutes,
+        'order': order,
+        'source': 'ai',
+        'accepted': true,
+        'status': 'accepted',
+      };
+}
+
+class SavedSubTask {
+  SavedSubTask({
+    required this.id,
+    required this.parentTaskId,
+    required this.title,
+    required this.suggestedDate,
+    this.scheduledDate,
+    this.estimateMinutes,
+    this.order = 0,
+    this.source = 'ai',
+    this.accepted = true,
+    this.status = 'accepted',
+  });
+
+  final String id;
+  final String parentTaskId;
+  final String title;
+  final String suggestedDate;
+  final String? scheduledDate;
+  final int? estimateMinutes;
+  final int order;
+  final String source;
+  final bool accepted;
+  final String status;
+
+  bool get isDone => status == 'done';
+
+  SavedSubTask copyWith({
+    String? title,
+    String? suggestedDate,
+    String? scheduledDate,
+    int? estimateMinutes,
+    String? status,
+    int? order,
+  }) {
+    return SavedSubTask(
+      id: id,
+      parentTaskId: parentTaskId,
+      title: title ?? this.title,
+      suggestedDate: suggestedDate ?? this.suggestedDate,
+      scheduledDate: scheduledDate ?? this.scheduledDate,
+      estimateMinutes: estimateMinutes ?? this.estimateMinutes,
+      order: order ?? this.order,
+      source: source,
+      accepted: accepted,
+      status: status ?? this.status,
+    );
+  }
+
+  factory SavedSubTask.fromJson(Map<String, dynamic> json) {
+    return SavedSubTask(
+      id: json['id'] as String? ?? '',
+      parentTaskId: json['parent_task_id'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      suggestedDate: json['suggested_date'] as String? ?? '',
+      scheduledDate: json['scheduled_date'] as String?,
+      estimateMinutes: json['estimate_minutes'] as int?,
+      order: json['order'] as int? ?? 0,
+      source: json['source'] as String? ?? 'ai',
+      accepted: json['accepted'] as bool? ?? true,
+      status: json['status'] as String? ?? 'accepted',
+    );
+  }
+}
+
+class ParentTask {
+  ParentTask({
+    required this.id,
+    required this.title,
+    required this.deadline,
+    required this.status,
+    this.notes,
+    this.subtasks = const [],
+  });
+
+  final String id;
+  final String title;
+  final String deadline;
+  final String status;
+  final String? notes;
+  final List<SavedSubTask> subtasks;
+
+  factory ParentTask.fromJson(Map<String, dynamic> json) {
+    final raw = json['subtasks'] as List<dynamic>? ?? [];
+    return ParentTask(
+      id: json['id'] as String? ?? '',
+      title: json['title'] as String? ?? '',
+      deadline: json['deadline'] as String? ?? '',
+      status: json['status'] as String? ?? 'open',
+      notes: json['notes'] as String?,
+      subtasks: raw
+          .map((e) => SavedSubTask.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+}

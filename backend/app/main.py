@@ -12,6 +12,7 @@ from firebase_admin import credentials
 
 from app.config import get_settings
 from app.routes.sessions import router as sessions_router
+from app.routes.tasks import router as tasks_router
 
 # Flutter web build output copied here before Cloud Run deploy.
 _STATIC_DIR = Path(__file__).resolve().parent / "static"
@@ -87,6 +88,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     app.include_router(sessions_router)
+    app.include_router(tasks_router)
 
     @app.get("/health")
     async def health() -> dict:

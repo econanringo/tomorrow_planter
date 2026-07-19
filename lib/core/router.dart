@@ -8,6 +8,7 @@ import '../features/discussion/discussion_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/morning/morning_screen.dart';
 import '../features/reflection/reflection_screen.dart';
+import '../features/tasks/task_seed_screen.dart';
 import '../features/tomorrow_plan/tomorrow_plan_screen.dart';
 import 'auth_provider.dart';
 
@@ -54,6 +55,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/morning',
         builder: (context, state) => const MorningScreen(),
+      ),
+      GoRoute(
+        path: '/tasks',
+        builder: (context, state) => const TaskSeedScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
