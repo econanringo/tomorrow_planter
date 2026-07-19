@@ -1,0 +1,211 @@
+# =============================================================================
+# Tomorrow Planter — Git ignore
+# Flutter アプリ + 将来の FastAPI / ADK / GCP バックエンドを想定
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# OS / エディタ
+# -----------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+*.swp
+*.swo
+*~
+.atom/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ / Android Studio
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code / Cursor — 個人設定は除外、共有したい設定だけ追跡する場合は例外を追加
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json
+.cursor/
+*.code-workspace
+
+# -----------------------------------------------------------------------------
+# 機密・環境変数・資格情報（絶対にコミットしない）
+# -----------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.p12
+*.pfx
+*.key
+secrets/
+credentials/
+**/service-account*.json
+**/google-credentials*.json
+**/gcp-credentials*.json
+**/application_default_credentials.json
+gcloud-service-key.json
+firebase-adminsdk*.json
+# ※ google-services.json / GoogleService-Info.plist はクライアント設定のため追跡可
+#    Admin SDK やサービスアカウント JSON は上のパターンで除外
+
+# ローカルのみの設定（例をコミットする場合は *.example を使う）
+*.local
+*.local.*
+config.local.*
+secrets.yaml
+secrets.yml
+
+# -----------------------------------------------------------------------------
+# Flutter / Dart / Pub
+# -----------------------------------------------------------------------------
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+/coverage/
+.fvm/flutter_sdk
+
+# Symbolication / Obfuscation
+app.*.symbols
+app.*.map.json
+
+# Android Studio build artifacts
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# -----------------------------------------------------------------------------
+# Python / FastAPI / ADK（将来の backend/ 向け）
+# -----------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+.env/
+
+# Test / type / lint caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Poetry のローカル設定のみ除外（poetry.lock / uv.lock はコミット推奨）
+poetry.toml
+
+# -----------------------------------------------------------------------------
+# Node（ツール・スクリプト用に使う場合）
+# -----------------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# -----------------------------------------------------------------------------
+# ログ・一時ファイル・ビルド成果物
+# -----------------------------------------------------------------------------
+*.log
+*.tmp
+*.temp
+*.bak
+tmp/
+temp/
+.tmp/
+.temp/
+out/
+output/
+*.class
+*.pyc
+
+# -----------------------------------------------------------------------------
+# データベース・ローカルストレージ
+# -----------------------------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.dump
+.pgdata/
+postgres-data/
+
+# -----------------------------------------------------------------------------
+# Docker / ローカルインフラ
+# -----------------------------------------------------------------------------
+docker-compose.override.yml
+.docker/
+
+# -----------------------------------------------------------------------------
+# テスト・カバレッジ・レポート
+# -----------------------------------------------------------------------------
+/coverage/
+coverage/
+test-results/
+playwright-report/
+.nyc_output/
+
+# -----------------------------------------------------------------------------
+# AI / エージェント作業のローカル成果物
+# -----------------------------------------------------------------------------
+.claude/
+.codex/
+.agent/
+.agents/
+*.patch
+!docs/**/*.patch
