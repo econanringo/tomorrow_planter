@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/models.dart';
 import '../../theme.dart';
+import 'typing_dots.dart';
 
 class AgentBubble extends StatelessWidget {
   const AgentBubble({super.key, required this.message});
@@ -70,12 +71,16 @@ class AgentBubble extends StatelessWidget {
               color: _bubbleColor(scheme),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Text(
-              message.message,
-              style: textTheme.bodyMedium?.copyWith(color: _onBubble(scheme)),
-            ),
+            child: message.isTyping
+                ? TypingDots(color: _onBubble(scheme).withValues(alpha: 0.7))
+                : Text(
+                    message.message,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: _onBubble(scheme),
+                    ),
+                  ),
           ),
-          if (message.confidence != null)
+          if (!message.isTyping && message.confidence != null)
             Padding(
               padding: const EdgeInsets.only(top: 2),
               child: Text(

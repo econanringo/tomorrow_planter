@@ -47,7 +47,12 @@ async def _persist_discussion_stream(
 ) -> AsyncIterator[str]:
     review_placeholder = session_id
     async for event in stream:
-        if event.get("type") == "agent_message" and event.get("agent_name"):
+        # Persist only final agent turns; skip composing / interim (done: false).
+        if (
+            event.get("type") == "agent_message"
+            and event.get("agent_name")
+            and event.get("done", True) is not False
+        ):
             try:
                 orch._repo.save_discussion_turn(
                     uid,

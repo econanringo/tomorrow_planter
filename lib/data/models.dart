@@ -142,12 +142,14 @@ class ChatMessage {
     required this.message,
     this.isUser = false,
     this.confidence,
+    this.isTyping = false,
   });
 
   final String agentName;
   final String message;
   final bool isUser;
   final double? confidence;
+  final bool isTyping;
 }
 
 /// SSE `decompose_progress.stage` と対応する思考段階。

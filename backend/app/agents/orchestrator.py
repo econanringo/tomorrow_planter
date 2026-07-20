@@ -32,9 +32,13 @@ class GeminiClient:
 
     async def generate(self, system: str, user: str) -> str:
         prompt = f"{system}\n\n---\n\n{user}"
-        # generate_content is sync in vertexai; run in thread via asyncio if needed later
-        response = self._model.generate_content(prompt)
-        return (response.text or "").strip()
+
+        def _call() -> str:
+            response = self._model.generate_content(prompt)
+            return (response.text or "").strip()
+
+        # Vertex generate_content is sync; offload so SSE can flush between turns.
+        return await asyncio.to_thread(_call)
 
     def embed(self, texts: List[str]) -> List[List[float]]:
         inputs = [TextEmbeddingInput(text=t, task_type="RETRIEVAL_DOCUMENT") for t in texts]
@@ -143,15 +147,14 @@ class NightFlowOrchestrator:
 
         # Memory / RAG
         yield {
-            "type": "agent_message",
+            "type": "agent_composing",
             "agent_name": "Memory",
-            "message": "過去の自分に似た日を探しています…",
-            "confidence": 0.5,
+            "message": "",
             "done": False,
         }
         rag_context: List[Dict[str, Any]] = []
         try:
-            query_emb = self._gemini.embed_query(summary)
+            query_emb = await asyncio.to_thread(self._gemini.embed_query, summary)
             rag_context = self._repo.search_similar_memories(uid, query_emb, limit=3)
         except Exception:
             rag_context = []
@@ -181,6 +184,12 @@ class NightFlowOrchestrator:
             f"- {g.get('title')}: {g.get('description', '')}" for g in goals
         ) or "- 資格試験に合格する（継続重視）"
 
+        yield {
+            "type": "agent_composing",
+            "agent_name": "Priority",
+            "message": "",
+            "done": False,
+        }
         priority_msg = await self._gemini.generate(
             "あなたは Priority Agent です。締切・疲労・長期目標・過去パターンから、明日の最優先を1つ決め、理由を日本語で2文以内で述べてください。",
             f"要約: {summary}\n気分: {mood}\n疲労: {fatigue}\n目標:\n{goals_text}\nMemory:\n{memory_msg}{intervention_block}",
@@ -194,6 +203,12 @@ class NightFlowOrchestrator:
             "done": True,
         }
 
+        yield {
+            "type": "agent_composing",
+            "agent_name": "Planner",
+            "message": "",
+            "done": False,
+        }
         planner_raw = await self._gemini.generate(
             "あなたは Planner Agent です。明日の現実的なスケジュールを JSON のみで返してください。"
             '形式: {"items":[{"time":"19:00","title":"...","duration_minutes":30,"is_priority":true,"notes":"..."}],'
@@ -241,6 +256,12 @@ class NightFlowOrchestrator:
             "meta": {"schedule": schedule, "top_priority": top_priority},
         }
 
+        yield {
+            "type": "agent_composing",
+            "agent_name": "Coach",
+            "message": "",
+            "done": False,
+        }
         coach_msg = await self._gemini.generate(
             "あなたは Coach Agent です。今日の頑張りを認め、明日への一言を日本語で2〜3文、励ますように伝えてください。継続を優先してください。",
             f"要約: {summary}\nPriority: {priority_msg}\nPlan top: {top_priority}\nMemory: {memory_msg}",
